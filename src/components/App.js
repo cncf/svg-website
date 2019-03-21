@@ -6,9 +6,6 @@ import { Switch, Route } from 'react-router-dom';
 
 import HomePageContainer from './HomePageContainer';
 import NotFoundPage from './NotFoundPage';
-import settings from 'project/settings.yml';
-const mainSettings = settings.big_picture.main;
-const extraSettings = settings.big_picture.extra;
 
 // This is a class-based component because the current
 // version of hot reloading won't hot reload a stateless

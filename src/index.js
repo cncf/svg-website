@@ -10,7 +10,7 @@ import configureStore, { history } from './store/configureStore';
 import Root from './components/Root';
 import './styles/theme.scss';
 import ReactGA from 'react-ga';
-require('favicon.png'); // Tell webpack to load favicon.png
+require('./images/favicon.png'); // Tell webpack to load favicon.png
 const store = configureStore();
 window.__MUI_USE_NEXT_TYPOGRAPHY_VARIANTS__ = true;
 

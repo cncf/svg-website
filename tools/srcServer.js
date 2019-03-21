@@ -10,7 +10,6 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
-import { projectPath } from './settings';
 
 const bundler = webpack(config);
 
@@ -21,28 +20,10 @@ browserSync({
     port: 3001
   },
   server: {
-    baseDir: [projectPath, 'src'], // project first, library second
+    baseDir: ['src'], // project first, library second
 
     middleware: [
       historyApiFallback(),
-      function(req, res, next) {
-        if (req.url.match(/iframeResizer.js/)) {
-          const path = require('path');
-          const fs = require('fs');
-          const fileContent1 = (function() {
-            try {
-              return fs.readFileSync(path.resolve(__dirname, '../node_modules/iframe-resizer/js/iframeResizer.min.js'), 'utf-8');
-            } catch(ex) {
-              console.info(ex.message);
-              return fs.readFileSync(path.resolve(projectPath, 'node_modules/iframe-resizer/js/iframeResizer.min.js'), 'utf-8');
-            }
-          })();
-          const fileContent2 = require('fs').readFileSync(path.resolve(__dirname, '../src/iframeResizer.js'), 'utf-8');
-          res.end(fileContent1 + '\n' + fileContent2);
-        } else {
-          next();
-        }
-      },
       function(req, res, next) {
         if (req.url.match(/^\/logos/)) {
           req.url = req.url.replace('/logos', '/cached_logos');
