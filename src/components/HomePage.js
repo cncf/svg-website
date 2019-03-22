@@ -6,7 +6,7 @@ import Header from './Header';
 
 const HomePage = ({}) => {
   return [
-    <Header />
+    <Header />,
     <div>
       <div><span>Status: </span></div>
       <div><span>Placeholder for a file input</span></div>
