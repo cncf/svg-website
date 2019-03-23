@@ -10,18 +10,19 @@ const HomePage = ({}) => {
     <Header />,
     <Dropzone onDrop={ (x) => console.info(x) }>
       {({getRootProps, getInputProps}) => (
-        <div {...getRootProps()}>
+        <div {...getRootProps()} style={{position: 'fixed', left: 0, top: 0, right: 0, bottom: 0}}>
           <input {...getInputProps() } />
-          <div>Drag 'n' drop some files here, or click to select files</div>
-          <div><span>Status: </span></div>
-          <div><span>Placeholder for a file input</span></div>
-          <div><span>Placeholder for an original SVG</span></div>
-          <div><span>Placeholder for an output SVG</span></div>
-          <div><button>Clear</button></div>
-          <div><button>Download></button></div>
         </div>
       )}
-    </Dropzone>
+    </Dropzone>,
+    <div>
+      <div><span>Status: </span></div>
+      <div><span>Placeholder for a file input</span></div>
+      <div><span>Placeholder for an original SVG</span></div>
+      <div><span>Placeholder for an output SVG</span></div>
+      <div><button>Clear</button></div>
+      <div><button>Download></button></div>
+    </div>
   ]
 };
 
