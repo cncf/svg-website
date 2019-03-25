@@ -4,6 +4,7 @@
 // data: null | { .. Data ... }
 import _ from 'lodash';
 import { push, replace } from 'connected-react-router';
+import { sendFile, getProgress } from './api';
 
 function uuid() { // https://stackoverflow.com/a/2117523/4986404
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -64,14 +65,16 @@ function startProcessing(id, file) {
   return async function(dispatch, getState) {
     const input = await tryToRead(file);
     await dispatch(setInputFile(id, input));
-    await dispatch(sendInputFile(id, input));
-    // while(true) {
-      // const info = await getConverterStatus(id);
-      // dispatch(setConverterStatus(id, info));
-      // if (info.status === 'finished' || info.status === 'error') {
-        // break;
-      // }
-    // }
+    await sendFile(id, input);
+    while(true) {
+      console.info('test');
+      const info = await getProgress(id);
+      console.info('test2');
+      await dispatch(setConverterStatus(id, info));
+      if (info.status === 'finished' || info.status === 'error') {
+        break;
+      }
+    }
   }
 }
 
@@ -84,14 +87,12 @@ function setInputFile(id, inputFile) {
   }
 }
 
-// a user s
-
-// a file content is being sent to the server
-function sendFile() {
+function setConverterStatus(id, info) {
   return {
-    type: 'main/SendFile'
-  }
-
+    type: 'main/SetConverterStatus',
+    id: id,
+    info: info
+  };
 }
 
 // a response is expected from a server. It can be a current status or the output
@@ -125,6 +126,12 @@ function setInputFileHandler(state, action) {
   return {...state, converters: {...state.converters, [newConverterState.id]: newConverterState}};
 }
 
+function setConverterStatusHandler(state, action) {
+  const converterState = state.converters[action.id];
+  const newConverterState = { ...converterState, status: action.info.status};
+  return {...state, converters: {...state.converters, [newConverterState.id]: newConverterState}};
+}
+
 
 function reducer(state = initialState, action) {
   switch(action.type) {
@@ -132,6 +139,8 @@ function reducer(state = initialState, action) {
       return addConverterHandler(state, action);
     case 'main/SetInputFile':
       return setInputFileHandler(state, action);
+    case 'main/SetConverterStatus':
+      return setConverterStatusHandler(state, action);
     default:
       return state;
   }
