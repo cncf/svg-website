@@ -4,7 +4,7 @@ import Header from './Header';
 import Dropzone from 'react-dropzone'
 import _ from 'lodash';
 
-const Converter = function({id, status, inputFile}) {
+const Converter = function({id, status, inputFile, removeConverter}) {
   const inputImageUrl = (function() {
     if (!inputFile) {
       return null;
@@ -22,7 +22,7 @@ const Converter = function({id, status, inputFile}) {
         backgroundImage: inputImageUrl,
         border: '1px solid #aaa'}} />
       <div><span>Placeholder for an output SVG</span></div>
-      <div><button>Clear</button></div>
+      <div><button onClick={() => removeConverter(id)}>Clear</button></div>
       <div><button>Download></button></div>
     </div>
   );
@@ -30,7 +30,7 @@ const Converter = function({id, status, inputFile}) {
 
 
 
-const HomePage = ({converters, receiveFiles}) => {
+const HomePage = ({converters, receiveFiles, removeConverter}) => {
   return (<Fragment>
     <Header />
     <Dropzone onDrop={ (x) => receiveFiles(x) }>
@@ -42,7 +42,7 @@ const HomePage = ({converters, receiveFiles}) => {
     </Dropzone>
     <Fragment>
       { _.values(converters).map(function(converter) {
-        return <Converter {...converter} />
+        return <Converter {...converter} removeConverter={removeConverter} />
       }) }
     </Fragment>
   </Fragment>)

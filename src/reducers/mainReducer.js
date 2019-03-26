@@ -67,9 +67,7 @@ function startProcessing(id, file) {
     await dispatch(setInputFile(id, input));
     await sendFile(id, input);
     while(true) {
-      console.info('test');
       const info = await getProgress(id);
-      console.info('test2');
       await dispatch(setConverterStatus(id, info));
       if (info.status === 'finished' || info.status === 'error') {
         break;
@@ -93,6 +91,13 @@ function setConverterStatus(id, info) {
     id: id,
     info: info
   };
+}
+
+export function removeConverter(id) {
+  return {
+    type: 'main/RemoveConverter',
+    id: id
+  }
 }
 
 // a response is expected from a server. It can be a current status or the output
@@ -120,16 +125,30 @@ function addConverterHandler(state, action) {
   return { ...state, converters: { ...state.converters, [action.converterState.id]: action.converterState  }};
 }
 
-function setInputFileHandler(state, action) {
+// a helper to process a state of a given converter element
+function updateConverterState(state, action, fn) {
   const converterState = state.converters[action.id];
-  const newConverterState = { ...converterState, status: 'sending', inputFile: action.inputFile};
+  if (!converterState) {
+    return state;
+  }
+  const newConverterState =  fn(converterState);
   return {...state, converters: {...state.converters, [newConverterState.id]: newConverterState}};
 }
 
-function setConverterStatusHandler(state, action) {
-  const converterState = state.converters[action.id];
-  const newConverterState = { ...converterState, status: action.info.status};
-  return {...state, converters: {...state.converters, [newConverterState.id]: newConverterState}};
+function setInputFileHandler(fullState, action) {
+  return updateConverterState(fullState, action, function(state) {
+    return { ...state, status: 'sending', inputFile: action.inputFile };
+  });
+}
+
+function setConverterStatusHandler(fullState, action) {
+  return updateConverterState(fullState, action, function(state) {
+    return { ...state, status: 'sending', status: action.info.status };
+  });
+}
+
+function removeConverterHandler(state, action) {
+  return {...state, converters: _.pickBy(state.converters, (converter) => converter.id !== action.id) };
 }
 
 
@@ -141,6 +160,8 @@ function reducer(state = initialState, action) {
       return setInputFileHandler(state, action);
     case 'main/SetConverterStatus':
       return setConverterStatusHandler(state, action);
+    case 'main/RemoveConverter':
+      return removeConverterHandler(state, action);
     default:
       return state;
   }
