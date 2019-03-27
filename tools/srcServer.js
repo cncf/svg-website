@@ -10,6 +10,10 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
+import proxy from 'http-proxy-middleware';
+
+import app from '../api';
+app.listen(3010);
 
 const bundler = webpack(config);
 
@@ -21,20 +25,13 @@ browserSync({
   },
   server: {
     baseDir: ['src'], // project first, library second
-
     middleware: [
+      proxy('/api', {
+        target: 'http://localhost:3010',
+        logLevel: 'debug',
+        changeOrigin: true
+      }),
       historyApiFallback(),
-      function(req, res, next) {
-        if (req.url.match(/^\/logos/)) {
-          req.url = req.url.replace('/logos', '/cached_logos');
-        }
-        if (req.url === '/favicon.png') {
-          req.url = '/images/favicon.png';
-        }
-        next();
-
-      },
-
       webpackDevMiddleware(bundler, {
         // Dev middleware can't access config, so we provide publicPath
         publicPath: config.output.publicPath,
@@ -55,7 +52,6 @@ browserSync({
         // for other settings see
         // https://webpack.js.org/guides/development/#using-webpack-dev-middleware
       }),
-
       // bundler should be the same as above
       webpackHotMiddleware(bundler)
     ]

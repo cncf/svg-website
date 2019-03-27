@@ -65,7 +65,11 @@ function startProcessing(id, file) {
   return async function(dispatch, getState) {
     const input = await tryToRead(file);
     await dispatch(setInputFile(id, input));
-    await sendFile(id, input);
+    const sendFileResult = await sendFile(id, input);
+    if (!sendFileResult) {
+      await dispatch(setConverterStatus(id, {status: 'upload_error'}));
+      return;
+    }
     while(true) {
       const info = await getProgress(id);
       await dispatch(setConverterStatus(id, info));
