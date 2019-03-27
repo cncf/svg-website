@@ -16,8 +16,12 @@ export async function sendFile(id, file) {
 }
 
 export async function getProgress(id) {
-  await Promise.delay(1000);
-  return {
-    status: 'queued'
+  try {
+    const response = await fetch(`/api/convert/${id}`);
+    const result = await response.json();
+    return result;
+  } catch(ex) {
+    console.info(ex);
+    return { status: 'failed' };
   }
 }

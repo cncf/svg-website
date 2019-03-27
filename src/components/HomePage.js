@@ -4,13 +4,13 @@ import Header from './Header';
 import Dropzone from 'react-dropzone'
 import _ from 'lodash';
 
-const Converter = function({id, status, inputFile, removeConverter}) {
-  const inputImageUrl = (function() {
-    if (!inputFile) {
+const Converter = function({id, status, inputFile, outputFile, removeConverter}) {
+  function imageUrl(file) {
+    if (!file) {
       return null;
     }
-    return `url('data: image/svg+xml;base64,${btoa(inputFile)}')`;
-  })();
+    return `url('data: image/svg+xml;base64,${btoa(file)}')`;
+  }
   return (
     <div>
       <div><span>Status: </span>{status}</div>
@@ -19,9 +19,15 @@ const Converter = function({id, status, inputFile, removeConverter}) {
         height: 200,
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundImage: inputImageUrl,
+        backgroundImage: imageUrl(inputFile),
         border: '1px solid #aaa'}} />
-      <div><span>Placeholder for an output SVG</span></div>
+      <div style={{
+        width: 200,
+        height: 200,
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundImage: imageUrl(outputFile),
+        border: '1px solid #aaa'}} />
       <div><button onClick={() => removeConverter(id)}>Clear</button></div>
       <div><button>Download></button></div>
     </div>

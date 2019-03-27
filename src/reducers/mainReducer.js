@@ -2,6 +2,7 @@
 
 // State Description (TODO: Add FLOW here!)
 // data: null | { .. Data ... }
+import Promise from 'bluebird';
 import _ from 'lodash';
 import { push, replace } from 'connected-react-router';
 import { sendFile, getProgress } from './api';
@@ -76,6 +77,7 @@ function startProcessing(id, file) {
       if (info.status === 'finished' || info.status === 'error') {
         break;
       }
+      await Promise.delay(1000);
     }
   }
 }
@@ -147,7 +149,7 @@ function setInputFileHandler(fullState, action) {
 
 function setConverterStatusHandler(fullState, action) {
   return updateConverterState(fullState, action, function(state) {
-    return { ...state, status: 'sending', status: action.info.status };
+    return { ...state, status: 'sending', status: action.info.status, outputFile: action.info.result };
   });
 }
 
