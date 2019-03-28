@@ -12,7 +12,7 @@ var queue = {};
 
 router
   .post("/api/convert/:id", async (context, next) => {
-    var body = await parse.text(context.req);
+    var body = await parse.text(context.req, {limit: '100mb'});
     queue[context.params.id] = {id: context.params.id, body: body, status: 'new'};
     context.body = { success: true };
   })
@@ -40,12 +40,17 @@ async function processQueue() {
     if (!first) {
       return;
     }
-    console.info('processing', first.id);
-    first.status = 'active';
-    const result = await autoCropSvg(first.body);
-    first.status = 'finished';
-    console.info('finished', first.id);
-    first.result = result;
+    try {
+      console.info('processing', first.id);
+      first.status = 'active';
+      const result = await autoCropSvg(first.body);
+      first.status = 'finished';
+      console.info('finished', first.id);
+      first.result = result;
+    } catch(ex) {
+      console.info(ex.message || ex);
+      first.status = 'failed';
+    }
   }
 }
 setInterval(processQueue, 1000);

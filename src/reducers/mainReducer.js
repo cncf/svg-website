@@ -74,7 +74,7 @@ function startProcessing(id, file) {
     while(true) {
       const info = await getProgress(id);
       await dispatch(setConverterStatus(id, info));
-      if (info.status === 'finished' || info.status === 'error') {
+      if (info.status === 'finished' || info.status === 'failed') {
         break;
       }
       await Promise.delay(1000);
