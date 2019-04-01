@@ -5,7 +5,7 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 import { push, replace } from 'connected-react-router';
-import { sendFile, getProgress } from './api';
+import { sendFile, getProgress, download} from './api';
 
 function uuid() { // https://stackoverflow.com/a/2117523/4986404
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -48,6 +48,16 @@ export function receiveFiles(files) {
   }
 }
 
+export function downloadFile(id) {
+  return async function(dispatch, getState) {
+    console.info(getState().main);
+    const converter = getState().main.converters[id];
+    if (converter) {
+      download({content: converter.outputFile, fileName: converter.name});
+    }
+  };
+}
+
 export function handleSvg() {
   return async function(dispatch, getState) {
 
@@ -65,8 +75,8 @@ function addConverter(converterState) {
 function startProcessing(id, file) {
   return async function(dispatch, getState) {
     const input = await tryToRead(file);
-    await dispatch(setInputFile(id, input));
-    const sendFileResult = await sendFile(id, input);
+    await dispatch(setInputFile({id, inputFile: input, name: file.name}));
+    const sendFileResult = await sendFile({id, inputFile: input});
     if (!sendFileResult) {
       await dispatch(setConverterStatus(id, {status: 'upload_error'}));
       return;
@@ -83,11 +93,12 @@ function startProcessing(id, file) {
 }
 
 // a user chooses a file
-function setInputFile(id, inputFile) {
+function setInputFile({id, inputFile, name}) {
   return {
     type: 'main/SetInputFile',
     id: id,
-    inputFile: inputFile
+    inputFile: inputFile,
+    name: name
   }
 }
 
@@ -110,13 +121,6 @@ export function removeConverter(id) {
 function waitOutput() {
   return {
     type: 'main/waitOutput'
-  }
-}
-
-// download a file
-function download() {
-  return {
-    type: 'download'
   }
 }
 
@@ -143,7 +147,7 @@ function updateConverterState(state, action, fn) {
 
 function setInputFileHandler(fullState, action) {
   return updateConverterState(fullState, action, function(state) {
-    return { ...state, status: 'sending', inputFile: action.inputFile };
+    return { ...state, status: 'sending', inputFile: action.inputFile, name: action.name };
   });
 }
 

@@ -24,7 +24,7 @@ router
     } else {
       context.body = { status: item.status, result: item.result };
     }
-  });
+  })
 
 app.use(router.routes());
 app.use(router.allowedMethods());

@@ -4,7 +4,7 @@ import Header from './Header';
 import Dropzone from 'react-dropzone'
 import _ from 'lodash';
 
-const Converter = function({id, status, inputFile, outputFile, removeConverter}) {
+const Converter = function({id, status, inputFile, outputFile, removeConverter, downloadFile}) {
   function imageUrl(file) {
     if (!file) {
       return null;
@@ -29,14 +29,14 @@ const Converter = function({id, status, inputFile, outputFile, removeConverter})
         backgroundImage: imageUrl(outputFile),
         border: '1px solid #aaa'}} />
       <div><button onClick={() => removeConverter(id)}>Clear</button></div>
-      <div><button>Download></button></div>
+      <div><button onClick={() => downloadFile(id)}>Download></button></div>
     </div>
   );
 }
 
 
 
-const HomePage = ({converters, receiveFiles, removeConverter}) => {
+const HomePage = ({converters, receiveFiles, removeConverter, downloadFile}) => {
   return (<Fragment>
     <Header />
     <Dropzone onDrop={ (x) => receiveFiles(x) }>
@@ -48,7 +48,7 @@ const HomePage = ({converters, receiveFiles, removeConverter}) => {
     </Dropzone>
     <Fragment>
       { _.values(converters).map(function(converter) {
-        return <Converter {...converter} removeConverter={removeConverter} />
+        return <Converter {...converter} removeConverter={removeConverter} downloadFile={downloadFile} />
       }) }
     </Fragment>
   </Fragment>)

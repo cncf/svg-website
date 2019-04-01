@@ -1,11 +1,11 @@
 import Promise from 'bluebird';
 
-export async function sendFile(id, file) {
+export async function sendFile({id, inputFile}) {
   // simulate for now
   try {
     const response = await fetch(`/api/convert/${id}`, {
       method: 'POST',
-      body: file
+      body: inputFile
     });
     const result = await response.json();
     return result.success === true;
@@ -24,4 +24,12 @@ export async function getProgress(id) {
     console.info(ex);
     return { status: 'failed' };
   }
+}
+
+export function download({content, fileName}) {
+  var encodedContent =  'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(content);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedContent);
+  link.setAttribute('download', fileName);
+  link.click();
 }
